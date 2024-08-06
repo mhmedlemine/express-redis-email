@@ -17,6 +17,10 @@ app.post('/set', async (req, res) => {
   res.send('Value set in Redis');
 });
 
+app.get('/hello', async (req, res) => {
+  res.send('Melo');
+});
+
 app.get('/get/:key', async (req, res) => {
   const { key } = req.params;
   const value = await client.get(key);
