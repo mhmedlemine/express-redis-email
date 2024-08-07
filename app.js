@@ -13,20 +13,44 @@ app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
 
+app.get('/hello', async (req, res) => {
+  res.send('Melo');
+});
+
 app.post('/set', async (req, res) => {
   const { key, value } = req.body;
   await client.set(key, value);
   res.send('Value set in Redis');
 });
 
-app.get('/hello', async (req, res) => {
-  res.send('Melo');
+app.post('/set-object', async (req, res) => {
+  const { key, value } = req.body;
+  await client.set(key, JSON.stringify(value));
+  res.send('Object set in Redis');
 });
 
 app.get('/get/:key', async (req, res) => {
   const { key } = req.params;
   const value = await client.get(key);
   res.json({ key, value });
+});
+
+app.get('/get-object/:key', async (req, res) => {
+  const { key } = req.params;
+  const value = await client.get(key);
+  res.json({ key, value: JSON.parse(value) });
+});
+
+app.post('/set-array', async (req, res) => {
+  const { key, value } = req.body;
+  await client.rPush(key, value.map(JSON.stringify));
+  res.send('Array set in Redis');
+});
+
+app.get('/get-array/:key', async (req, res) => {
+  const { key } = req.params;
+  const values = await client.lRange(key, 0, -1);
+  res.json({ key, value: values.map(JSON.parse) });
 });
 
 app.post('/send-email', async (req, res) => {
