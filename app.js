@@ -4,6 +4,8 @@ const nodemailer = require("nodemailer");
 const fs = require("fs");
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const zlib = require('zlib');
+
 const app = express();
 app.use(cors());
 app.use(bodyParser.json({limit: '50mb'}));
@@ -17,6 +19,34 @@ app.listen(port, () => {
 
 app.get('/hello', async (req, res) => {
   res.send('Melo');
+});
+
+app.post('/set-object-compressed', async (req, res) => {
+  const { key, compressedValue } = req.body;
+  try {
+    const value = zlib.gunzipSync(Buffer.from(compressedValue, 'base64')).toString();
+    await client.set(key, value);
+    res.send('Compressed object set in Redis');
+  } catch (error) {
+    console.error('Error setting compressed object:', error);
+    res.status(500).send('Error setting compressed object');
+  }
+});
+
+app.get('/get-object-compressed/:key', async (req, res) => {
+  const { key } = req.params;
+  try {
+    const value = await client.get(key);
+    if (value) {
+      const compressedValue = zlib.gzipSync(value).toString('base64');
+      res.json({ key, compressedValue });
+    } else {
+      res.json({ key, compressedValue: null });
+    }
+  } catch (error) {
+    console.error('Error getting compressed object:', error);
+    res.status(500).send('Error getting compressed object');
+  }
 });
 
 app.post('/set', async (req, res) => {
