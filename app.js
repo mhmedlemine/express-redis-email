@@ -23,17 +23,18 @@ app.post('/set', async (req, res) => {
   res.send('Value set in Redis');
 });
 
+app.get('/get/:key', async (req, res) => {
+  const { key } = req.params;
+  const value = await client.get(key);
+  res.json({ key, value });
+});
+
 app.post('/set-object', async (req, res) => {
   const { key, value } = req.body;
   await client.set(key, JSON.stringify(value));
   res.send('Object set in Redis');
 });
 
-app.get('/get/:key', async (req, res) => {
-  const { key } = req.params;
-  const value = await client.get(key);
-  res.json({ key, value });
-});
 
 app.get('/get-object/:key', async (req, res) => {
   const { key } = req.params;
@@ -57,6 +58,16 @@ app.post('/send-email', async (req, res) => {
   const { to, subject, text, attachmentPath, fileName } = req.body;
   await sendEmailWithAttachment(to, subject, text, attachmentPath, fileName);
   res.send('Email sent');
+});
+
+app.post('/flush-cache', async (req, res) => {
+  try {
+    await client.flushAll();
+    res.send('All Redis cache has been successfully deleted');
+  } catch (error) {
+    console.error('Error flushing Redis cache:', error);
+    res.status(500).send('Error flushing Redis cache');
+  }
 });
 
 const client = redis.createClient({
