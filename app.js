@@ -13,8 +13,16 @@ app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
 
-app.post('/set', async (req, res) => {
+app.post('/setString', async (req, res) => {
   const { key, value } = req.body;
+  await client.set(key, value);
+  await client.set(key, value);
+  res.send('Value set in Redis');
+});
+app.post('/setObject', async (req, res) => {
+  const { key, value } = req.body;
+  const serializedObject = JSON.stringify(value);
+  await client.set(key, serializedObject);
   await client.set(key, value);
   res.send('Value set in Redis');
 });
@@ -23,10 +31,21 @@ app.get('/hello', async (req, res) => {
   res.send('Melo');
 });
 
-app.get('/get/:key', async (req, res) => {
+app.get('/getString/:key', async (req, res) => {
   const { key } = req.params;
   const value = await client.get(key);
-  res.json({ key, value });
+  if (value) {
+    return value;
+  }
+  return null;
+});
+app.get('/getObject/:key', async (req, res) => {
+  const { key } = req.params;
+  const serializedObject = await client.get(key);
+  if (serializedObject) {
+    return JSON.parse(serializedObject);
+  }
+  return null;
 });
 
 app.post('/send-email', async (req, res) => {
