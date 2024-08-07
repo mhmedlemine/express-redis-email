@@ -42,17 +42,6 @@ app.post('/set-object-chunked', async (req, res) => {
   }
 });
 
-app.get('/get-object/:key', async (req, res) => {
-  const { key } = req.params;
-  try {
-    const value = await client.get(key);
-    res.json({ key, value: JSON.parse(value) });
-  } catch (error) {
-    console.error('Error getting object:', error);
-    res.status(500).send('Error getting object');
-  }
-});
-
 app.post('/set-object-compressed', async (req, res) => {
   const { key, compressedValue } = req.body;
   try {
@@ -102,9 +91,15 @@ app.post('/set-object', async (req, res) => {
 
 app.get('/get-object/:key', async (req, res) => {
   const { key } = req.params;
-  const value = await client.get(key);
-  res.json({ key, value: JSON.parse(value) });
+  try {
+    const value = await client.get(key);
+    res.json({ key, value: JSON.parse(value) });
+  } catch (error) {
+    console.error('Error getting object:', error);
+    res.status(500).send('Error getting object');
+  }
 });
+
 
 app.post('/set-array', async (req, res) => {
   const { key, value } = req.body;
