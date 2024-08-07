@@ -2,7 +2,9 @@ const express = require("express");
 const redis = require("redis");
 const nodemailer = require("nodemailer");
 const fs = require("fs");
+const cors = require('cors');
 
+app.use(cors());
 const app = express();
 const port = 3000;
 app.use(express.json());
