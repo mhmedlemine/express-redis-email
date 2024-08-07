@@ -4,8 +4,8 @@ const nodemailer = require("nodemailer");
 const fs = require("fs");
 const cors = require('cors');
 
-app.use(cors());
 const app = express();
+app.use(cors());
 const port = 3000;
 app.use(express.json());
 
