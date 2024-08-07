@@ -21,6 +21,38 @@ app.get('/hello', async (req, res) => {
   res.send('Melo');
 });
 
+app.post('/set-object-chunked', async (req, res) => {
+  const { key, chunk, index, total } = req.body;
+  try {
+    await client.rPush(`${key}:chunks`, chunk);
+    
+    if (index === total - 1) {
+      // Last chunk received, combine all chunks
+      const chunks = await client.lRange(`${key}:chunks`, 0, -1);
+      const fullValue = chunks.join('');
+      await client.set(key, fullValue);
+      await client.del(`${key}:chunks`);
+      res.send('Object set in Redis');
+    } else {
+      res.send('Chunk received');
+    }
+  } catch (error) {
+    console.error('Error setting chunked object:', error);
+    res.status(500).send('Error setting chunked object');
+  }
+});
+
+app.get('/get-object/:key', async (req, res) => {
+  const { key } = req.params;
+  try {
+    const value = await client.get(key);
+    res.json({ key, value: JSON.parse(value) });
+  } catch (error) {
+    console.error('Error getting object:', error);
+    res.status(500).send('Error getting object');
+  }
+});
+
 app.post('/set-object-compressed', async (req, res) => {
   const { key, compressedValue } = req.body;
   try {
