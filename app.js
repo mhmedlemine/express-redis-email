@@ -149,6 +149,8 @@ const transporter = nodemailer.createTransport({
 });
 
 async function sendEmailWithAttachment(to, subject, text, attachmentPath, fileName) {
+  console.log("attachmentPath", attachmentPath)
+  console.log("fileName", fileName)
   const mailOptions = {
     from: "smartmssa.jira.report.sender@gmail.com",
     to: to,
