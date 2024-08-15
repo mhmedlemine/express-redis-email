@@ -154,12 +154,12 @@ async function sendEmailWithAttachment(to, subject, text, attachmentPath, fileNa
     to: to,
     subject: subject,
     text: text,
-    // attachments: [
-    //   {
-    //     filename: fileName,
-    //     content: fs.createReadStream(attachmentPath),
-    //   },
-    // ],
+    attachments: [
+      {
+        filename: fileName,
+        content: fs.createReadStream(attachmentPath),
+      },
+    ],
   };
 
   try {
