@@ -149,15 +149,37 @@ const transporter = nodemailer.createTransport({
 });
 
 const base64ToUnicode = (str) => {
+  if (str === undefined || str === null) {
+    throw new Error('Input string is undefined or null');
+  }
+  if (typeof str !== 'string') {
+    throw new Error(`Input is not a string, received ${typeof str}`);
+  }
   try {
-    return decodeURIComponent(escape(Buffer.from(str, 'base64').toString('binary')));
+    const buffer = Buffer.from(str, 'base64');
+    const binaryString = buffer.toString('binary');
+    return decodeURIComponent(escape(binaryString));
   } catch (error) {
-    console.error('Error decoding base64:', error);
-    throw new Error('Invalid base64 encoding');
+    console.error('Error in base64ToUnicode:', error);
+    throw new Error(`Failed to decode base64 string: ${error.message}`);
   }
 };
 async function sendEmailWithAttachment(to, subject, text, attachmentContent, fileName) {
-  const decodedContent = base64ToUnicode(attachmentContent);
+  console.log("Received attachment content:", typeof attachmentContent, attachmentContent ? attachmentContent.substring(0, 100) + '...' : 'null or empty');
+  console.log("fileName:", fileName);
+
+  if (!attachmentContent) {
+    throw new Error('Attachment content is missing or empty');
+  }
+
+  let decodedContent;
+  try {
+    decodedContent = base64ToUnicode(attachmentContent);
+  } catch (error) {
+    console.error('Error decoding attachment content:', error);
+    throw new Error(`Failed to decode attachment content: ${error.message}`);
+  }
+  
   const mailOptions = {
     from: "smartmssa.jira.report.sender@gmail.com",
     to: to,
