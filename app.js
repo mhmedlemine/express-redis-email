@@ -148,9 +148,13 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+const base64ToUnicode = (str) => {
+  return decodeURIComponent(atob(str).split('').map(function(c) {
+    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+  }).join(''));
+};
 async function sendEmailWithAttachment(to, subject, text, attachmentContent, fileName) {
-  console.log("attachmentContent", attachmentContent)
-  console.log("fileName", fileName)
+  const decodedContent = base64ToUnicode(attachmentContent);
   const mailOptions = {
     from: "smartmssa.jira.report.sender@gmail.com",
     to: to,
@@ -159,7 +163,7 @@ async function sendEmailWithAttachment(to, subject, text, attachmentContent, fil
     attachments: [
       {
         filename: fileName,
-        content: Buffer.from(attachmentContent, 'base64'),
+        content: Buffer.from(decodedContent),
       },
     ],
   };
