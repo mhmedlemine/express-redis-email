@@ -114,8 +114,8 @@ app.get('/get-array/:key', async (req, res) => {
 });
 
 app.post('/send-email', async (req, res) => {
-  const { to, subject, text, attachmentPath, fileName } = req.body;
-  await sendEmailWithAttachment(to, subject, text, attachmentPath, fileName);
+  const { to, subject, text, attachmentContent, fileName } = req.body;
+  await sendEmailWithAttachment(to, subject, text, attachmentContent, fileName);
   res.send('Email sent');
 });
 
@@ -179,7 +179,7 @@ async function sendEmailWithAttachment(to, subject, text, attachmentContent, fil
     console.error('Error decoding attachment content:', error);
     throw new Error(`Failed to decode attachment content: ${error.message}`);
   }
-  
+
   const mailOptions = {
     from: "smartmssa.jira.report.sender@gmail.com",
     to: to,
