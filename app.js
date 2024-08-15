@@ -148,8 +148,8 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-async function sendEmailWithAttachment(to, subject, text, attachmentPath, fileName) {
-  console.log("attachmentPath", attachmentPath)
+async function sendEmailWithAttachment(to, subject, text, attachmentContent, fileName) {
+  console.log("attachmentContent", attachmentContent)
   console.log("fileName", fileName)
   const mailOptions = {
     from: "smartmssa.jira.report.sender@gmail.com",
@@ -159,7 +159,7 @@ async function sendEmailWithAttachment(to, subject, text, attachmentPath, fileNa
     attachments: [
       {
         filename: fileName,
-        content: fs.createReadStream(attachmentPath),
+        content: Buffer.from(attachmentContent, 'base64'),
       },
     ],
   };
