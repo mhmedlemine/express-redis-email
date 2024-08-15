@@ -149,9 +149,12 @@ const transporter = nodemailer.createTransport({
 });
 
 const base64ToUnicode = (str) => {
-  return decodeURIComponent(atob(str).split('').map(function(c) {
-    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-  }).join(''));
+  try {
+    return decodeURIComponent(escape(Buffer.from(str, 'base64').toString('binary')));
+  } catch (error) {
+    console.error('Error decoding base64:', error);
+    throw new Error('Invalid base64 encoding');
+  }
 };
 async function sendEmailWithAttachment(to, subject, text, attachmentContent, fileName) {
   const decodedContent = base64ToUnicode(attachmentContent);
@@ -163,7 +166,7 @@ async function sendEmailWithAttachment(to, subject, text, attachmentContent, fil
     attachments: [
       {
         filename: fileName,
-        content: Buffer.from(decodedContent),
+        content: Buffer.from(decodedContent, 'utf-8'),
       },
     ],
   };
