@@ -165,9 +165,6 @@ const base64ToUnicode = (str) => {
   }
 };
 async function sendEmailWithAttachment(to, subject, text, attachmentContent, fileName) {
-  console.log("Received attachment content:", typeof attachmentContent, attachmentContent ? attachmentContent.substring(0, 100) + '...' : 'null or empty');
-  console.log("fileName:", fileName);
-
   if (!attachmentContent) {
     throw new Error('Attachment content is missing or empty');
   }
@@ -181,7 +178,7 @@ async function sendEmailWithAttachment(to, subject, text, attachmentContent, fil
   }
 
   const mailOptions = {
-    from: "smartmssa.jira.report.sender@gmail.com",
+    from: "SMART MS Jira KPIs",
     to: to,
     subject: subject,
     text: text,
